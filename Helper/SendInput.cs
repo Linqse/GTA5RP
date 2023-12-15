@@ -51,7 +51,7 @@ public partial class Main
         var rand = random.Next(-100, 100);
         
         var point = new Point(Win.ActiveWindow.DwmWindowBounds.Width / 2, Win.ActiveWindow.DwmWindowBounds.Height / 2);
-        await Secret(new Point(point.X, point.Y+rand));
+        await Secret(new Point(point.X+rand, point.Y+rand));
 
     }
     private async Task Secret(Point point)
@@ -68,13 +68,15 @@ public partial class Main
         await SendInputController.Send(send, CancellationToken.None);
     }
 
-    private async Task SendBackgroundKey(string key)
+    private async Task SendBackgroundKey(string key, Point point = default)
     {
         var kp = HotkeyConverter.ConvertFromString(key);
+        
         var send = DefaultWindowsMessageArgs with
         {
             Window = Win.ActiveWindow,
             Gesture = kp,
+            MouseLocation = point == default ? Point.Empty : point
         };
         await SendInputController.Send(send, CancellationToken.None);
     }

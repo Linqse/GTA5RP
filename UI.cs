@@ -2,7 +2,7 @@
 
 public partial class Main
 {
-    private bool ToggleLogs = true;
+    private bool ToggleLogs = false;
     
     private bool _port;
     private bool Port

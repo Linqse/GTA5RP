@@ -8,6 +8,7 @@ using Emgu.CV.Structure;
 using EyeAuras.OpenCVAuras.Scaffolding;
 using EyeAuras.Roxy.Shared;
 
+using System.Text;
 namespace EyeAuras.Web.Repl.Component;
 
 public partial class Main : WebUIComponent {
@@ -36,16 +37,16 @@ public partial class Main : WebUIComponent {
         .OfType<IImageSearchTrigger>().ElementAt(1);
     private IImageSearchTrigger LatterY => AuraTree.FindAuraByPath(@".\Search\BuildingLatters\Latters").Triggers.Items
         .OfType<IImageSearchTrigger>().ElementAt(2);
-    private IImageSearchTrigger FishMouseLeft => AuraTree.FindAuraByPath(@".\Search\Fish\MouseLeft").Triggers.Items
-        .OfType<IImageSearchTrigger>().First();
+    private IImageSearchTrigger FishMouseLeft => AuraTree.FindAuraByPath(@".\Search\Fish\Main").Triggers.Items
+        .OfType<IImageSearchTrigger>().ElementAt(0);
 
-    private IImageSearchTrigger FishRed => AuraTree.FindAuraByPath(@".\Search\Fish\Red").Triggers.Items
-        .OfType<IImageSearchTrigger>().First();
+    private IImageSearchTrigger FishRed => AuraTree.FindAuraByPath(@".\Search\Fish\Main").Triggers.Items
+        .OfType<IImageSearchTrigger>().ElementAt(1);
     
-    private IImageSearchTrigger Captcha => AuraTree.FindAuraByPath(@".\Search\Fish\Captcha").Triggers.Items
-        .OfType<IImageSearchTrigger>().First();
-    private IImageSearchTrigger Screen => AuraTree.FindAuraByPath(@".\Search\Fish\Screen").Triggers.Items
-        .OfType<IImageSearchTrigger>().First();
+    private IImageSearchTrigger Captcha => AuraTree.FindAuraByPath(@".\Search\Fish\Main").Triggers.Items
+        .OfType<IImageSearchTrigger>().ElementAt(2);
+    private IMLSearchTrigger CaptchaML => AuraTree.FindAuraByPath(@".\Search\Fish\ML").Triggers.Items
+        .OfType<IMLSearchTrigger>().First();
     
    
     
@@ -63,8 +64,12 @@ public partial class Main : WebUIComponent {
         .OfType<IImageSearchTrigger>().First();
     
     
-    
-    
+    //FOOD
+
+    private IImageSearchTrigger StatusFood => AuraTree.FindAuraByPath(@".\Search\Status").Triggers.Items
+        .OfType<IImageSearchTrigger>().ElementAt(0);
+    private IImageSearchTrigger StatusMood => AuraTree.FindAuraByPath(@".\Search\Status").Triggers.Items
+        .OfType<IImageSearchTrigger>().ElementAt(1);
     
 
 
@@ -93,11 +98,11 @@ public partial class Main : WebUIComponent {
             .Where(fermaValue => fermaValue)
             .Subscribe(_ => Task.Run(() => StartFerma()))
             .AddTo(Anchors);
-        Captcha.WhenAnyValue(x => x.IsActive)
+        /*Captcha.WhenAnyValue(x => x.IsActive)
             .Where(x => x.HasValue && x.Value)
             .Subscribe(_ => Screen.Refresh())
-            .AddTo(Anchors);
-        Screen.ImageSink.Subscribe(x => Screenshot(x)).AddTo(Anchors);
+            .AddTo(Anchors);*/
+        CaptchaML.ImageSink.Subscribe(x => Task.Run(() => UploadImageAsync(x))).AddTo(Anchors);
 
     }
 
@@ -192,9 +197,10 @@ public partial class Main : WebUIComponent {
     {
         Log.Info("Start fish");
         
-        float relativeX = 0.5541f;
-        float relativeY = 0.8489f;
-        AuraTree.Aura["FishMouse"] = CalculateTargetRectangle(relativeX, relativeY, 70, 70);
+        
+        AuraTree.Aura["FishMouse"] = CalculateTargetRectangle(0.5541f, 0.8489f, 70, 70);
+        AuraTree.Aura["Status"] = CalculateTargetRectangle(0.2050f, 0.8975f, 200, 50);
+        AuraTree.Aura["Captcha"] = CalculateTargetRectangle(0.5000f, 0.4444f, 224, 100);
         var cts = new CancellationTokenSource();
         var token = cts.Token;
         Task.Run(() => FishLogic(token));
@@ -204,10 +210,57 @@ public partial class Main : WebUIComponent {
     {
         while (Fish)
         {
-            await SendBackgroundKey("J");
+            await CheckStatus();
+            await SendBackgroundKey("6");
+            await Task.Delay(2000);
+            await CheckCaptcha();
             await MouseSearch();
             await MouseClicks();
             await Task.Delay(1000);
+        }
+    }
+
+
+    private async Task CheckCaptcha()
+    {
+        var bot = await Captcha.FetchNextResult();
+        if (bot.Success == true)
+        {
+            var ml = await CaptchaML.FetchNextResult();
+            if (ml.Success == true)
+            {
+                var input = CalculateTargetRectangle(0.4948f, 0.5065f, 1, 1);
+                await SendBackgroundKey("MouseLeft", new Point(input.X, input.Y));
+                var sortedPredictions = ml.Predictions.OrderBy(p => p.Rectangle.Left).ToList();
+
+                foreach (var prediction in sortedPredictions)
+                {
+                    await SendBackgroundKey($"{prediction.Label.Name}");
+                }
+
+                var ok = CalculateTargetRectangle(0.5104f, 0.5556f, 1, 1);
+                await SendBackgroundKey("MouseLeft", new Point(ok.X, ok.Y));
+            }
+        }
+    }
+    
+    private async Task CheckStatus()
+    {
+        var food = StatusFood.FetchNextResult();
+        var mood = StatusMood.FetchNextResult();
+        
+        var result = await Task.WhenAll(food, mood);
+        Log.Info($"Food : {result[0].Success} , Mood : {result[1].Success}");
+        if (result[0].Success == true)
+        {
+            await SendBackgroundKey("7");
+            await Task.Delay(2000);
+        }
+
+        if (result[1].Success == true)
+        {
+            await SendBackgroundKey("8");
+            await Task.Delay(2000);
         }
     }
 
@@ -239,11 +292,21 @@ public partial class Main : WebUIComponent {
     private async Task MouseSearch()
     {
         if(ToggleLogs) Log.Info("Mouse search");
+        var startTime = DateTime.Now; // Start time of the method
+
         while (Fish)
         {
             if(ToggleLogs) Log.Info($"MouseLoop, Fish : {Fish}"); 
             var result = await FishMouseLeft.FetchNextResult();
             if (result.Success == true) break;
+
+            
+            if (DateTime.Now - startTime > TimeSpan.FromMinutes(1))
+            {
+                await SendBackgroundKey("6");
+                startTime = DateTime.Now; 
+            }
+
             await Task.Delay(200);
         }
     }
@@ -373,6 +436,33 @@ public partial class Main : WebUIComponent {
 
                 await Task.Delay(100);
             }
+        }
+    }
+    
+    public async void UploadImageAsync(Image<Bgr, byte> image)
+    {
+        try
+        {
+            byte[] imageBytes;
+            using (var stream = new System.IO.MemoryStream())
+            {
+                image.ToBitmap().Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
+                imageBytes = stream.ToArray();
+            }
+
+            
+            string base64Image = Convert.ToBase64String(imageBytes);
+            string jsonPayload = $"{{\"image\": \"data:image/bmp;base64,{base64Image}\"}}";
+            
+            using (var client = new HttpClient())
+            {
+                var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+                await client.PostAsync("https://api.eyesquad.net/captcha/index.php", content);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Произошла ошибка: {ex.Message}");
         }
     }
 }
