@@ -1,0 +1,9 @@
+.list-group-item {
+    display: flex; /* Используем Flexbox для выравнивания элементов */
+    justify-content: space-between; /* Распределяем пространство между элементами */
+    align-items: center; /* Центрируем элементы по вертикали */
+}
+
+.list-group-item button {
+    /* Стили для кнопок */
+}

@@ -1,0 +1,24 @@
+@inherits WebUIComponent;
+
+
+<ul class="list-group">
+    <li class="list-group-item">
+        <input type="checkbox" class="btn-check" id="btn-check-outlined1" autocomplete="off" @bind="Port">
+        <label class="btn btn-outline-primary" for="btn-check-outlined1">Порт</label><br>
+        <input type="checkbox" class="btn-check" id="btn-check-outlined2" autocomplete="off" @bind="Building">
+        <label class="btn btn-outline-primary" for="btn-check-outlined2">Стройка</label><br>
+        <input type="checkbox" class="btn-check" id="btn-check-outlined3" autocomplete="off" @bind="Mines">
+        <label class="btn btn-outline-primary" for="btn-check-outlined3">Шахты</label><br>
+    </li>
+    <li class="list-group-item">
+        <input type="checkbox" class="btn-check" id="btn-check-outlined4" autocomplete="off" @bind="Fish">
+        <label class="btn btn-outline-primary" for="btn-check-outlined4">Рыбалка</label><br>
+    </li>
+    <li class="list-group-item">
+        <input type="checkbox" class="btn-check" id="btn-check-outlined5" autocomplete="off" @bind="Ferma">
+        <label class="btn btn-outline-primary" for="btn-check-outlined5">Ферма</label><br>
+    </li>
+    
+</ul>
+
+@Screen.IsActive - bebe
