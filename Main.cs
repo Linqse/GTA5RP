@@ -210,10 +210,10 @@ public partial class Main : WebUIComponent {
     {
         while (Fish)
         {
-            await CheckStatus();
+            if(UseFood || UseMood) await CheckStatus();
             await SendBackgroundKey("6");
             await Task.Delay(2000);
-            await CheckCaptcha();
+            if(UseCaptcha) await CheckCaptcha();
             await MouseSearch();
             await MouseClicks();
             await Task.Delay(1000);
@@ -236,9 +236,10 @@ public partial class Main : WebUIComponent {
                 foreach (var prediction in sortedPredictions)
                 {
                     await SendBackgroundKey($"{prediction.Label.Name}");
+                    
                 }
-
-                var ok = CalculateTargetRectangle(0.5104f, 0.5556f, 1, 1);
+                await Task.Delay(1000);
+                var ok = CalculateTargetRectangle(0.4521f, 0.5583f, 1, 1);
                 await SendBackgroundKey("MouseLeft", new Point(ok.X, ok.Y));
             }
         }
@@ -250,7 +251,7 @@ public partial class Main : WebUIComponent {
         var mood = StatusMood.FetchNextResult();
         
         var result = await Task.WhenAll(food, mood);
-        Log.Info($"Food : {result[0].Success} , Mood : {result[1].Success}");
+        if(ToggleLogs) Log.Info($"Food : {result[0].Success} , Mood : {result[1].Success}");
         if (result[0].Success == true)
         {
             await SendBackgroundKey("7");

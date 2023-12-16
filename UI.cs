@@ -1,4 +1,6 @@
-﻿namespace EyeAuras.Web.Repl.Component;
+﻿using PoeShared.Native;
+
+namespace EyeAuras.Web.Repl.Component;
 
 public partial class Main
 {
@@ -39,5 +41,26 @@ public partial class Main
         get => _ferma;
         set => RaiseAndSetIfChanged(ref _ferma, value);
     }
+
+    private bool UseFood { get; set; } = true;
+    private bool UseMood { get; set; } = true;
+    private bool UseCaptcha { get; set; } = true;
+
+    private IWebUIAuraOverlay MainOverlay => AuraTree.Aura.Overlays.Items.OfType<IWebUIAuraOverlay>().First();
+    private IHotkeyIsActiveTrigger Hotkey => AuraTree.Aura.Triggers.Items.OfType<IHotkeyIsActiveTrigger>().First();
     
+    private void LockUnlock()
+    {
+        MainOverlay.IsLocked = !MainOverlay.IsLocked;
+    }
+    private void OverClose()
+    {
+        Hotkey.TriggerValue = false;
+        if (Win.ActiveWindow.Handle != IntPtr.Zero)
+        {
+            UnsafeNative.ActivateWindow(Win.ActiveWindow.Handle);
+        }
+
+    }
+
 }
