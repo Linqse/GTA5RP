@@ -52,18 +52,18 @@ public partial class Main : WebUIComponent {
     
     //FER COW
 
-    private IImageSearchTrigger FermaA => AuraTree.FindAuraByPath(@".\Search\Ferma\A").Triggers.Items
-        .OfType<IImageSearchTrigger>().First();
-    private IImageSearchTrigger FermaD => AuraTree.FindAuraByPath(@".\Search\Ferma\D").Triggers.Items
-        .OfType<IImageSearchTrigger>().First();
-    private IImageSearchTrigger FermaCow => AuraTree.FindAuraByPath(@".\Search\Ferma\Cow").Triggers.Items
-        .OfType<IImageSearchTrigger>().First();
-    private IImageSearchTrigger FermaRage => AuraTree.FindAuraByPath(@".\Search\Ferma\Rage").Triggers.Items
-        .OfType<IImageSearchTrigger>().First();
-    private IImageSearchTrigger FermaE => AuraTree.FindAuraByPath(@".\Search\Ferma\E").Triggers.Items
-        .OfType<IImageSearchTrigger>().First();
+    private IImageSearchTrigger FermaA => AuraTree.FindAuraByPath(@".\Search\Ferma\Main").Triggers.Items
+        .OfType<IImageSearchTrigger>().ElementAt(0);
+    private IImageSearchTrigger FermaD => AuraTree.FindAuraByPath(@".\Search\Ferma\Main").Triggers.Items
+        .OfType<IImageSearchTrigger>().ElementAt(1);
+    private IImageSearchTrigger FermaCow => AuraTree.FindAuraByPath(@".\Search\Ferma\Condition").Triggers.Items
+        .OfType<IImageSearchTrigger>().ElementAt(0);
+    private IImageSearchTrigger FermaRage => AuraTree.FindAuraByPath(@".\Search\Ferma\Main").Triggers.Items
+        .OfType<IImageSearchTrigger>().ElementAt(2);
+    private IImageSearchTrigger FermaE => AuraTree.FindAuraByPath(@".\Search\Ferma\Condition").Triggers.Items
+        .OfType<IImageSearchTrigger>().ElementAt(1);
     
-    
+     
     //FOOD
 
     private IImageSearchTrigger StatusFood => AuraTree.FindAuraByPath(@".\Search\Status").Triggers.Items
@@ -98,10 +98,7 @@ public partial class Main : WebUIComponent {
             .Where(fermaValue => fermaValue)
             .Subscribe(_ => Task.Run(() => StartFerma()))
             .AddTo(Anchors);
-        /*Captcha.WhenAnyValue(x => x.IsActive)
-            .Where(x => x.HasValue && x.Value)
-            .Subscribe(_ => Screen.Refresh())
-            .AddTo(Anchors);*/
+        
         CaptchaML.ImageSink.Subscribe(x => Task.Run(() => UploadImageAsync(x))).AddTo(Anchors);
 
     }
@@ -114,10 +111,10 @@ public partial class Main : WebUIComponent {
         AuraTree.Aura["FermCow"] = CalculateTargetRectangle(0.6353f, 0.8345f, 50, 50);
         AuraTree.Aura["FermE"] = CalculateTargetRectangle(0.4698f, 0.8426f, 50, 50);
 
-        var cowCondition = AuraTree.FindAuraByPath(@".\Search\Ferma\Cow").EnablingConditions.Items.OfType<IDefaultTrigger>().First();
-        var eCondition = AuraTree.FindAuraByPath(@".\Search\Ferma\E").EnablingConditions.Items.OfType<IDefaultTrigger>().First();
+        var cowCondition = AuraTree.FindAuraByPath(@".\Search\Ferma\Condition").EnablingConditions.Items.OfType<IDefaultTrigger>().First();
+        
         cowCondition.TriggerValue = true;
-        eCondition.TriggerValue = true;
+        
         try
         {
             while (Ferma)
@@ -138,7 +135,7 @@ public partial class Main : WebUIComponent {
         finally
         {
             cowCondition.TriggerValue = false;
-            eCondition.TriggerValue = false;
+            
         }
         
         
@@ -168,30 +165,7 @@ public partial class Main : WebUIComponent {
             await Task.Delay(100);
         }
     }
-
     
-    private async Task Screenshot(Image<Bgr, byte> img)
-    {
-        Log.Info("In screen");
-        try
-        {
-
-            string fileName = $"captcha_{DateTime.Now:yyyyMMdd_HHmmss}.png";
-
-
-            string folderPath = @"E:\CapScreen";
-
-
-            string filePath = Path.Combine(folderPath, fileName);
-
-
-            img.Save(filePath);
-        }
-        catch
-        {
-            Log.Info("Problem with save script");
-        }
-    }
     
     private async Task StartFishing()
     {
@@ -408,15 +382,7 @@ public partial class Main : WebUIComponent {
             ImgBuildingConditions.TriggerValue = false;
         }
     }
-
-    private async Task CheckBuilding()
-    {
-        while (Building)
-        {
-            await ImgBuilding.FetchNextResult();
-            await Task.Delay(100);
-        }
-    }
+    
     
     private async Task StartPort()
     {
@@ -431,7 +397,7 @@ public partial class Main : WebUIComponent {
                 var result = await ImgPort.FetchNextResult();
                 if (result.Success == true)
                 {
-                    await SendKey("E");
+                    await SendBackgroundKey("E");
                     await Task.Delay(100);
                 }
 
