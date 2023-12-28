@@ -9,16 +9,24 @@ using EyeAuras.OpenCVAuras.Scaffolding;
 using EyeAuras.Roxy.Shared;
 
 using System.Text;
+using Newtonsoft.Json;
+using PoeShared.Modularity;
+
 namespace EyeAuras.Web.Repl.Component;
 
 public partial class Main : WebUIComponent {
     
     private IInputSimulatorEx InputWindowsEx { get; init; }
+    private Config _config = new Config();
     
-    public Main([Dependency("WindowsInputSimulator")] IInputSimulatorEx inputWindowsEx)
+    public Main([Dependency("WindowsInputSimulator")] IInputSimulatorEx inputWindowsEx,
+        IAppArguments appArguments,
+        IAuraTreeScriptingApi treeApi)
     {
+        ConfigPath = Path.Combine(appArguments.AppDataDirectory, "EyeSquad", $"GTA5RP-{treeApi.Aura.Id}.cfg");
         InputWindowsEx = inputWindowsEx;
     }
+    private static string ConfigPath { get; set; } 
     
     private IWinExistsTrigger Win =>
         AuraTree.FindAuraByPath(@".\WinExists").Triggers.Items.OfType<IWinExistsTrigger>().First();
@@ -71,6 +79,11 @@ public partial class Main : WebUIComponent {
     private IImageSearchTrigger StatusMood => AuraTree.FindAuraByPath(@".\Search\Status").Triggers.Items
         .OfType<IImageSearchTrigger>().ElementAt(1);
     
+    
+    //BINDS
+    private IHotkeyIsActiveTrigger FishHotkey => AuraTree.FindAuraByPath(@".\WinExists").Triggers.Items
+        .OfType<IHotkeyIsActiveTrigger>().First();
+    
 
 
     protected override async Task HandleAfterFirstRender()
@@ -90,8 +103,8 @@ public partial class Main : WebUIComponent {
             .Where(minesValue => minesValue) 
             .Subscribe(_ => Task.Run(() => StartMines()))
             .AddTo(Anchors);
-        this.WhenAnyValue(x => x.Fish)
-            .Where(fishValue => fishValue) 
+        this.WhenAnyValue(x => x.FishHotkey.IsActive)
+            .Where(x => x.HasValue && x.Value) 
             .Subscribe(_ => Task.Run(() => StartFishing()))
             .AddTo(Anchors);
         this.WhenAnyValue(x => x.Ferma)
@@ -99,6 +112,7 @@ public partial class Main : WebUIComponent {
             .Subscribe(_ => Task.Run(() => StartFerma()))
             .AddTo(Anchors);
         
+        LoadConfig();
         CaptchaML.ImageSink.Subscribe(x => Task.Run(() => UploadImageAsync(x))).AddTo(Anchors);
 
     }
@@ -182,10 +196,10 @@ public partial class Main : WebUIComponent {
 
     private async Task FishLogic(CancellationToken token)
     {
-        while (Fish)
+        while (FishHotkey.IsActive == true)
         {
             if(UseFood || UseMood) await CheckStatus();
-            await SendBackgroundKey("6");
+            await SendBackgroundKey(_config.roadkey);
             await Task.Delay(2000);
             if(UseCaptcha) await CheckCaptcha();
             await MouseSearch();
@@ -234,7 +248,7 @@ public partial class Main : WebUIComponent {
 
         if (result[1].Success == true)
         {
-            await SendBackgroundKey("8");
+            await SendBackgroundKey(_config.moodkey);
             await Task.Delay(2000);
         }
     }
@@ -243,7 +257,7 @@ public partial class Main : WebUIComponent {
     {
         if(ToggleLogs) Log.Info("Mouse click");
         int count = 0;
-        while (Fish)
+        while (FishHotkey.IsActive == true)
         {
             if (count % 5 == 0 && count != 0)
             {
@@ -269,9 +283,9 @@ public partial class Main : WebUIComponent {
         if(ToggleLogs) Log.Info("Mouse search");
         var startTime = DateTime.Now; // Start time of the method
 
-        while (Fish)
+        while (FishHotkey.IsActive == true)
         {
-            if(ToggleLogs) Log.Info($"MouseLoop, Fish : {Fish}"); 
+            if(ToggleLogs) Log.Info($"MouseLoop, Fish : {FishHotkey.IsActive}"); 
             var result = await FishMouseLeft.FetchNextResult();
             if (result.Success == true) break;
 
@@ -431,6 +445,46 @@ public partial class Main : WebUIComponent {
         {
             Log.Error($"Произошла ошибка: {ex.Message}");
         }
+    }
+    
+    
+    
+    private void SaveConfig() 
+    {
+        
+        string json = JsonConvert.SerializeObject(_config);
+        string directoryPath = Path.GetDirectoryName(ConfigPath);
+        
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
+
+        using (StreamWriter streamWriter = new StreamWriter(ConfigPath))
+        using (JsonWriter jsonWriter = new JsonTextWriter(streamWriter))
+        {
+            jsonWriter.Formatting = Formatting.Indented; // Устанавливаем форматирование для отступов
+
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.Serialize(jsonWriter, _config);
+        }
+        
+    }
+    
+    
+    private void LoadConfig()
+    {
+        if (File.Exists(ConfigPath))
+        {
+            string json = File.ReadAllText(ConfigPath);
+            _config = JsonConvert.DeserializeObject<Config>(json);
+        }
+        else
+        {
+            _config = new Config();
+        }
+
+        
     }
 }
 

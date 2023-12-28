@@ -1,4 +1,6 @@
 ﻿using PoeShared.Native;
+using KeyboardEventArgs = Microsoft.AspNetCore.Components.Web.KeyboardEventArgs;
+using MouseEventArgs = Microsoft.AspNetCore.Components.Web.MouseEventArgs;
 
 namespace EyeAuras.Web.Repl.Component;
 
@@ -42,7 +44,7 @@ public partial class Main
         set => RaiseAndSetIfChanged(ref _ferma, value);
     }
 
-    private bool UseFood { get; set; } = true;
+    private bool UseFood { get; set; } = false;
     private bool UseMood { get; set; } = true;
     private bool UseCaptcha { get; set; } = true;
 
@@ -62,5 +64,67 @@ public partial class Main
         }
 
     }
+    
+    
+    private bool keybindermodal = false;
+    /*
+    private void Togglekeybindermodal()
+    {
+        keybindermodal = !keybindermodal; // Переключает состояние модального окна
+    }
+    private void OnKeyClicked(string key)
+    {
+        keybindermodal = false;
+        FishHotkey.Hotkey = HotkeyConverter.ConvertFromString(key);
+    }*/
 
+    
+    private Func<string, Task> currentOnKeyClicked;
+    
+
+    private Task OnKeyClickedForKeybinder(string key)
+    {
+        keybindermodal = false;
+        FishHotkey.Hotkey = HotkeyConverter.ConvertFromString(key);
+        return Task.CompletedTask;
+    }
+
+    private Task OnKeyClickedForMood(string key)
+    {
+        keybindermodal = false;
+        _config.moodkey = key;
+        SaveConfig();
+        return Task.CompletedTask;
+    } 
+    private Task OnKeyClickedForRoad(string key)
+    {
+        keybindermodal = false;
+        _config.roadkey = key;
+        SaveConfig();
+        return Task.CompletedTask;
+    } 
+
+    private void ToggleModal(string modalName)
+    {
+        keybindermodal = !keybindermodal;
+        switch (modalName)
+        {
+            case "keybinder":
+                currentOnKeyClicked = OnKeyClickedForKeybinder;
+                break;
+            case "mood":
+                currentOnKeyClicked = OnKeyClickedForMood;
+                break;
+            case "road":
+                currentOnKeyClicked = OnKeyClickedForRoad;
+                break;
+            // Добавьте другие случаи по необходимости
+        }
+    }
+
+    private async Task TestCall()
+    {
+        TelegramMessage("Test");
+    }
+    
 }

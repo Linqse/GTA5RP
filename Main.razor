@@ -1,157 +1,239 @@
 @inherits WebUIComponent;
+@using AntDesign
 
 <HeadContent>
-    
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <script src="https://kit.fontawesome.com/052e19e72c.js" crossorigin="anonymous"></script>
+    <link href="_content/AntDesign/css/ant-design-blazor.css" rel="stylesheet"/>
+    <link href="_content/EyeAuras.Blazor.Shared/assets/css/main-ant-blazor.css" rel="stylesheet"/>
+    <link href="css/bootstrap.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+      <script src="https://kit.fontawesome.com/052e19e72c.js" crossorigin="anonymous"></script>
 </HeadContent>
 
 
-  <div class="card fullpage-div">
-    <div class="card-header text-center">
-      <div class="menu-wrapper">
-        <menu class="items-wrapper">
-              @if (MainOverlay.IsLocked)
-              {
-                <a href="#" class="menu-item fa fa-unlock gray-link" @onclick="LockUnlock"></a>
-              }
-              @if (!MainOverlay.IsLocked)
-              {
-                <a href="#" class=" fa fa-lock gray-link" @onclick="LockUnlock"></a>
-              }
-              <a href="#" class="menu-item fa-solid fa-xmark  gray-link" @onclick="OverClose" style="margin-right: 0px; "></a>
-            </menu>
-      </div>
-      <b>GTA5RP</b>
+<div class="card fullpage-div">
+  <div class="card-header text-center">
+    <div class="menu-wrapper">
+      <menu class="items-wrapper">
+        @if (MainOverlay.IsLocked)
+        {
+          <a href="#" class="menu-item fa fa-unlock gray-link" @onclick="LockUnlock"></a>
+        }
+        @if (!MainOverlay.IsLocked)
+        {
+          <a href="#" class=" fa fa-lock gray-link" @onclick="LockUnlock"></a>
+        }
+        <a href="#" class="menu-item fa-solid fa-xmark  gray-link" @onclick="OverClose" style="margin-right: 0px; "></a>
+      </menu>
     </div>
-    <div class="card-body">
+    <b>GTA5RP</b>
+  </div>
+  <div class="card-body">
       
-      <div class="bs5-tabs-container">
-        <div class="row">
-          <div class="col-md-4 col-sm-5">
-            <div class="bs5-tabs-left">
-              <ul class="nav nav-tabs flex-column text-center">
-                <li class="nav-item">
-                  <a class="bs5-nav-link active" id="tab-a" data-bs-toggle="tab" href="#a"><i class="fa fa-home" aria-hidden="true" ></i></a>
-                </li>
-                <li class="nav-item">
-                  <a class="bs5-nav-link" id="tab-b" data-bs-toggle="tab" href="#b"><i class="fa-solid fa-fish"></i></a>
-                </li>
-                <li class="nav-item">
-                  <a class="bs5-nav-link" id="tab-c" data-bs-toggle="tab" href="#c"><i class="fa fa-bell" aria-hidden="true"></i></a>
-                </li>
+    <div class="bs5-tabs-container">
+      <div class="row">
+        <div class="col-md-4 col-sm-5">
+          <div class="bs5-tabs-left">
+            <ul class="nav nav-tabs flex-column text-center">
+              <li class="nav-item">
+                <a class="bs5-nav-link active" id="tab-a" data-bs-toggle="tab" href="#a"><i class="fa fa-home" aria-hidden="true" ></i></a>
+              </li>
+              <li class="nav-item">
+                <a class="bs5-nav-link" id="tab-b" data-bs-toggle="tab" href="#b"><i class="fa-solid fa-fish"></i></a>
+              </li>
+              <li class="nav-item">
+                <a class="bs5-nav-link" id="tab-c" data-bs-toggle="tab" href="#c"><i class="fa fa-bell" aria-hidden="true"></i></a>
+              </li>
                 
-                <li class="nav-item">
-                  <a class="bs5-nav-link" id="tab-e" data-bs-toggle="tab" href="#e"><i class="fa fa-heart"></i></a>
-                </li>
-              </ul>
-              <div class="tab-content">
-                <div class="tab-pane active" id="a">
-                  <div class="card fullpage-div">
+              <li class="nav-item">
+                <a class="bs5-nav-link" id="tab-e" data-bs-toggle="tab" href="#e"><i class="fa fa-heart"></i></a>
+              </li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" id="a">
+                <div class="card fullpage-div">
                     
-                    <div class="card-body">
-                      <div class="d-grid gap-2" style="margin-bottom: 15px;">
-                        <div class="text-center">Default</div>
-                        
-                        <div class="form-check form-switch">
-                          <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked1" @bind="Port">
-                          <label class="form-check-label" for="flexSwitchCheckChecked1">Port</label>
-                        </div>
-                        <div class="form-check form-switch">
-                          <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked2" @bind="Building">
-                          <label class="form-check-label" for="flexSwitchCheckChecked2">Building</label>
-                        </div>
-                        <div class="form-check form-switch">
-                          <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked3" @bind="Mines">
-                          <label class="form-check-label" for="flexSwitchCheckChecked3">Mines</label>
-                        </div>
-                        <div class="form-check form-switch">
-                          <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked4" @bind="Ferma">
-                          <label class="form-check-label" for="flexSwitchCheckChecked4">Farm</label>
-                        </div>
-                      </div>
-                    </div>
-                    
-                  </div>
-                </div>
-                <div class="tab-pane" id="b">
-
-                  <div class="card">
-                    
-                    <div class="card-body">
+                  <div class="card-body">
+                    <div class="d-grid gap-2" style="margin-bottom: 15px;">
+                      
+                      <button @onclick="TestCall">Test</button>  
                       <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="fishing" name="fishing" @bind="Fish">
-                        <label class="form-check-label" for="fishing">Enable fishing</label>
+                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked1" @bind="Port">
+                        <label class="form-check-label" for="flexSwitchCheckChecked1">Порт</label>
                       </div>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked2" @bind="Building">
+                        <label class="form-check-label" for="flexSwitchCheckChecked2">Стройка</label>
+                      </div>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked3" @bind="Mines">
+                        <label class="form-check-label" for="flexSwitchCheckChecked3">Шахта</label>
+                      </div>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked4" @bind="Ferma">
+                        <label class="form-check-label" for="flexSwitchCheckChecked4">Ферма</label>
+                      </div>
+                    </div>
+                  </div>
+                    
+                </div>
+              </div>
+              <div class="tab-pane" id="b">
+
+                <div class="card">
+                    
+                  <div class="card-body">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="fishing" name="fishing" @bind="FishHotkey.TriggerValue">
+                      <kbd @onclick='() => ToggleModal("keybinder")'><i class="fa fa-keyboard-o mx-1"  ></i>@FishHotkey.Hotkey</kbd>
+                      <label class="form-check-label" for="fishing">Включить рыбалка</label>
                       
-                      <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked1" @bind="UseFood">
-                        <label class="form-check-label" for="flexCheckChecked1">Use food, key [7]</label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked2" @bind="UseMood">
-                        <label class="form-check-label" for="flexCheckChecked2">Use mood, key [8]</label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked3" @bind="UseCaptcha">
-                        <label class="form-check-label" for="flexCheckChecked3">Resolve captcha</label>
-                      </div>
+                    </div>
+                    <div class="form-check">
+                      <kbd @onclick='() => { ToggleModal("road");  }'><i class="fa fa-keyboard-o mx-1"  ></i>@if(_config.roadkey != null)@_config.roadkey.ToUpper()</kbd>
+                      <label class="form-check-label" for="flexCheckChecked2">Удочка</label>
+                    </div>
+                    
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked1" @bind="UseFood">
+                      <label class="form-check-label" for="flexCheckChecked1">Захавать еду</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked2" @bind="UseMood">
+                      <kbd @onclick='() => { ToggleModal("mood");  }'><i class="fa fa-keyboard-o mx-1"  ></i>@if(_config.moodkey != null)@_config.moodkey.ToUpper()</kbd>
+                      <label class="form-check-label" for="flexCheckChecked2">Поднять настроение</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked3" @bind="UseCaptcha">
+                      <label class="form-check-label" for="flexCheckChecked3">Resolve captcha</label>
+                    </div>
                       
 
-                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <div class="tab-pane" id="c">
+                <div class="card">
+                    
+                  <div class="card-body">
+                    Reserved <br/>
+                    In development
                   </div>
 
                 </div>
-                <div class="tab-pane" id="c">
-                  <div class="card">
-                    
-                    <div class="card-body">
-                      Reserved <br/>
-                      In development
-                    </div>
 
-                  </div>
-
-                </div>
-                <div class="tab-pane" id="d">
-                  <div class="card">
+              </div>
+              <div class="tab-pane" id="d">
+                <div class="card">
                     
-                    <div class="card-body">
+                  <div class="card-body">
                       
-                    </div>
                   </div>
-
                 </div>
-                <div class="tab-pane" id="e">
-                  <div class="card">
+
+              </div>
+              <div class="tab-pane" id="e">
+                <div class="card">
                     
-                    <div class="card-body">
+                  <div class="card-body">
                       
-                      <p class="mb-0">Telegram  <a href="https://t.me/linqse">Script dev</a> </p>
-                      <p class="mb-0">Youtube   <a href="https://www.youtube.com/channel/UCuOK8NYkgqe-eo6LzCLxY4w">EyeSquad</a> </p>
-                      <hr> 
-                      <p class="mb-0">EyeAuras  <a href="https://discord.gg/hhy8BTdxb6">Discord</a> </p>
-                      <p class="mb-0">EyeAuras  <a href="https://eyeauras.net/library">Script library</a> </p>
+                    <p class="mb-0">Telegram  <a href="https://t.me/linqse">Script dev</a> </p>
+                    <p class="mb-0">Youtube   <a href="https://www.youtube.com/channel/UCuOK8NYkgqe-eo6LzCLxY4w">EyeSquad</a> </p>
+                    <hr> 
+                    <p class="mb-0">EyeAuras  <a href="https://discord.gg/hhy8BTdxb6">Discord</a> </p>
+                    <p class="mb-0">EyeAuras  <a href="https://eyeauras.net/library">Script library</a> </p>
                       
                                               
                       
-                    </div>
                   </div>
-                  
-                  
-                  
                 </div>
+                  
+                  
+                  
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="card-footer text-body-secondary text-center" style="position: relative;">
-      
-      Created by Linqse 😈
-      <a href="https://github.com/Linqse/GTA5RP" class="fa-brands fa-github gray-link" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);"></a>
-    </div>
-
   </div>
+
+  <div class="card-footer text-body-secondary text-center" style="position: relative;">
+      
+    Created by Linqse 😈
+    <a href="https://github.com/Linqse/GTA5RP" class="fa-brands fa-github gray-link" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);"></a>
+  </div>
+
+</div>
+
+
+
+
+<div class="modal @(keybindermodal ? "show" : "")" id="ModalKeyboard">
+  <div class="modal-dialog ">
+    <div class="modal-content">
+
+      
+      <div class="modal-header">
+        
+      </div>
+      
+   
+      <div class="modal-body " >
+        <div class="keyborad ">
+          <div class="keyboadr-inner text-center">
+            @foreach (var key in new[] { "F1", "F2", "F3", "F4", "F5", "F6"  })
+            {
+              <div class="key" @onclick="() => currentOnKeyClicked(key)">
+                <div class="key-cotnent">@key</div>
+              </div>
+            }
+            
+            
+          </div>
+        </div>
+        <div class="keyborad ">
+          <div class="keyboadr-inner text-center">
+            @foreach (var key in new[] { "F7", "F8", "F9", "F10", "F11", "F12" })
+            {
+              <div class="key" @onclick="() => currentOnKeyClicked(key)">
+                <div class="key-cotnent">@key</div>
+              </div>
+            }
+                    
+                    
+          </div>
+        </div>
+        <div class="keyborad ">
+          <div class="keyboadr-inner text-center">
+            @foreach (var key in new[] { "1", "2", "3", "4", "5", "6" })
+            {
+              <div class="key" @onclick="() => currentOnKeyClicked(key)">
+                <div class="key-cotnent">@key</div>
+              </div>
+            }
+                    
+                    
+          </div>
+        </div>
+        <div class="keyborad ">
+          <div class="keyboadr-inner text-center">
+            @foreach (var key in new[] {  "7", "8", "9", "0", "-", "=" })
+            {
+              <div class="key" @onclick="() => currentOnKeyClicked(key)">
+                <div class="key-cotnent">@key</div>
+              </div>
+            }
+                            
+                            
+          </div>
+        </div>
+      </div>
+
+      
+
+    </div>
+  </div>
+</div>
+
+
