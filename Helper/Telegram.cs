@@ -26,8 +26,7 @@ public partial class Main
             using (var client = new HttpClient())
             {
                 var response = await client.PostAsync("https://eyeapi.eyesquad.net/Call", content);
-                var responseString = await response.Content.ReadAsStringAsync();
-                Log.Info(responseString);
+                
             }
         }
         catch (Exception ex)

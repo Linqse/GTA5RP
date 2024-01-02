@@ -96,13 +96,20 @@ public partial class Main
         SaveConfig();
         return Task.CompletedTask;
     } 
+    private Task OnKeyClickedForFood(string key)
+    {
+        keybindermodal = false;
+        _config.foodkey = key;
+        SaveConfig();
+        return Task.CompletedTask;
+    } 
     private Task OnKeyClickedForRoad(string key)
     {
         keybindermodal = false;
         _config.roadkey = key;
         SaveConfig();
         return Task.CompletedTask;
-    } 
+    }  
 
     private void ToggleModal(string modalName)
     {
@@ -117,6 +124,9 @@ public partial class Main
                 break;
             case "road":
                 currentOnKeyClicked = OnKeyClickedForRoad;
+                break;
+            case "food":
+                currentOnKeyClicked = OnKeyClickedForFood;
                 break;
             // Добавьте другие случаи по необходимости
         }

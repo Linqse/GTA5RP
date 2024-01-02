@@ -9,6 +9,7 @@ using EyeAuras.OpenCVAuras.Scaffolding;
 using EyeAuras.Roxy.Shared;
 
 using System.Text;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using PoeShared.Modularity;
 
@@ -55,7 +56,8 @@ public partial class Main : WebUIComponent {
         .OfType<IImageSearchTrigger>().ElementAt(2);
     private IMLSearchTrigger CaptchaML => AuraTree.FindAuraByPath(@".\Search\Fish\ML").Triggers.Items
         .OfType<IMLSearchTrigger>().First();
-    
+    private ITextSearchTrigger TextSearch => AuraTree.FindAuraByPath(@".\Search\Fish\Main").Triggers.Items
+        .OfType<ITextSearchTrigger>().First();
    
     
     //FER COW
@@ -199,14 +201,76 @@ public partial class Main : WebUIComponent {
         while (FishHotkey.IsActive == true)
         {
             if(UseFood || UseMood) await CheckStatus();
+            
             await SendBackgroundKey(_config.roadkey);
             await Task.Delay(2000);
             if(UseCaptcha) await CheckCaptcha();
+            await Task.Delay(2000);
+            var checkbag = await CheckBag();
+            if (!checkbag) break;
+            
             await MouseSearch();
             await MouseClicks();
             await Task.Delay(1000);
         }
     }
+
+    private async Task<bool> CheckBag()
+    {
+        await SendBackgroundKey("I");
+        await Task.Delay(1000);
+        var checkbag = await CheckFreeSpace();
+        if (!checkbag)
+        {
+            FishHotkey.TriggerValue = false;
+            await SendBackgroundKey("I");
+            if (_config.TelegramAlert && _config.TelegramUsername != null)
+            {
+                TelegramMessage("Был достигнут лимит веса. GTA5RP бот выключен.");
+            }
+            return false;
+            
+        }
+        await SendBackgroundKey("I");
+        return true;
+    }
+    
+    
+
+    private async Task<bool> CheckFreeSpace()
+    {
+
+        AuraTree.Aura["TextSearch"] = CalculateTargetRectangle(0.8714f, 0.2944f, 200, 100);
+        var result = await TextSearch.FetchNextResult();
+        if (result.Text != null)
+        {
+            var regex = new Regex(@"(\d\D?\d\D?\d\D?\d\D?\d)\s*kr");
+            var match = regex.Match(result.Text);
+
+            if (match.Success)
+            {
+                var fiveDigits = match.Groups[1].Value;
+                fiveDigits = Regex.Replace(fiveDigits, @"\D", "");
+
+                if (fiveDigits.Length == 5)
+                {
+                    var firstThreeDigits = int.Parse(fiveDigits.Substring(0, 3)) / 100.0f;
+                    var lastTwoDigits = int.Parse(fiveDigits.Substring(3, 2)) / 100.0f;
+
+                    var multipliedLastTwo = lastTwoDigits * 100;
+                    var freeSpace = (multipliedLastTwo - firstThreeDigits);
+                    Log.Info($"Free space {freeSpace:F2}kg");
+
+                    return freeSpace > 0.5f;
+                }
+            }
+        }
+        return true;
+    }
+
+
+
+
 
 
     private async Task CheckCaptcha()
@@ -217,18 +281,37 @@ public partial class Main : WebUIComponent {
             var ml = await CaptchaML.FetchNextResult();
             if (ml.Success == true)
             {
-                var input = CalculateTargetRectangle(0.4948f, 0.5065f, 1, 1);
+                if (ml.Predictions.Length < 7)
+                {
+                    if (_config.TelegramAlert)
+                    {
+                        TelegramMessage("Хоязин, я не смог разобрать капчу, я выключаюсь...");
+                    }
+
+                    FishHotkey.TriggerValue = false;
+                    return;
+                }
+
+                
+                var input = CalculateTargetRectangleMessageAPI(0.5000f, 0.5093f, 1, 1);
+                await Task.Delay(500); // IDK CAPTCHA TRY FIX
                 await SendBackgroundKey("MouseLeft", new Point(input.X, input.Y));
                 var sortedPredictions = ml.Predictions.OrderBy(p => p.Rectangle.Left).ToList();
-
+                await Task.Delay(1500); // IDK CAPTCHA TRY FIX
+                string captcha = "";
                 foreach (var prediction in sortedPredictions)
                 {
                     await SendBackgroundKey($"{prediction.Label.Name}");
-                    
+                    await Task.Delay(100);
+                    captcha += prediction.Label.Name;
                 }
+
+                ///TelegramMessage($"Captcha : {captcha}");
                 await Task.Delay(1000);
-                var ok = CalculateTargetRectangle(0.4521f, 0.5583f, 1, 1);
+                var ok = CalculateTargetRectangleMessageAPI(0.4583f, 0.5602f, 1, 1);
                 await SendBackgroundKey("MouseLeft", new Point(ok.X, ok.Y));
+                
+                
             }
         }
     }
@@ -240,13 +323,13 @@ public partial class Main : WebUIComponent {
         
         var result = await Task.WhenAll(food, mood);
         if(ToggleLogs) Log.Info($"Food : {result[0].Success} , Mood : {result[1].Success}");
-        if (result[0].Success == true)
+        if (result[0].Success == true && UseFood)
         {
-            await SendBackgroundKey("7");
+            await SendBackgroundKey(_config.foodkey);
             await Task.Delay(2000);
         }
 
-        if (result[1].Success == true)
+        if (result[1].Success == true && UseMood)
         {
             await SendBackgroundKey(_config.moodkey);
             await Task.Delay(2000);

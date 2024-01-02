@@ -55,7 +55,6 @@
                   <div class="card-body">
                     <div class="d-grid gap-2" style="margin-bottom: 15px;">
                       
-                      <button @onclick="TestCall">Test</button>  
                       <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked1" @bind="Port">
                         <label class="form-check-label" for="flexSwitchCheckChecked1">Порт</label>
@@ -72,6 +71,7 @@
                         <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked4" @bind="Ferma">
                         <label class="form-check-label" for="flexSwitchCheckChecked4">Ферма</label>
                       </div>
+                      
                     </div>
                   </div>
                     
@@ -79,37 +79,74 @@
               </div>
               <div class="tab-pane" id="b">
 
-                <div class="card">
-                    
-                  <div class="card-body">
-                    <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" id="fishing" name="fishing" @bind="FishHotkey.TriggerValue">
-                      <kbd @onclick='() => ToggleModal("keybinder")'><i class="fa fa-keyboard-o mx-1"  ></i>@FishHotkey.Hotkey</kbd>
-                      <label class="form-check-label" for="fishing">Включить рыбалка</label>
-                      
-                    </div>
-                    <div class="form-check">
-                      <kbd @onclick='() => { ToggleModal("road");  }'><i class="fa fa-keyboard-o mx-1"  ></i>@if(_config.roadkey != null)@_config.roadkey.ToUpper()</kbd>
-                      <label class="form-check-label" for="flexCheckChecked2">Удочка</label>
-                    </div>
-                    
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked1" @bind="UseFood">
-                      <label class="form-check-label" for="flexCheckChecked1">Захавать еду</label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked2" @bind="UseMood">
-                      <kbd @onclick='() => { ToggleModal("mood");  }'><i class="fa fa-keyboard-o mx-1"  ></i>@if(_config.moodkey != null)@_config.moodkey.ToUpper()</kbd>
-                      <label class="form-check-label" for="flexCheckChecked2">Поднять настроение</label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked3" @bind="UseCaptcha">
-                      <label class="form-check-label" for="flexCheckChecked3">Resolve captcha</label>
-                    </div>
-                      
+               
+                  
+                       <ul class="list-group">
+                           <!-- Рыбалка -->
+                           <li class="list-group-item d-flex justify-content-between align-items-center">
+                               <div>
+                                   <input class="form-check-input me-1" type="checkbox" id="fishing" name="fishing" @bind="FishHotkey.TriggerValue">
+                                   Включить рыбалку
+                               </div>
+                               <kbd @onclick='() => ToggleModal("keybinder")'><i class="fa fa-keyboard-o mx-1"></i>@FishHotkey.Hotkey</kbd>
+                           </li>
+               
+                           <!-- Удочка -->
+                           <li class="list-group-item d-flex justify-content-between align-items-center">
+                               Удочка
+                               <kbd @onclick='() => ToggleModal("road")'><i class="fa fa-keyboard-o mx-1"></i>@if(_config.roadkey != null)@_config.roadkey.ToUpper()</kbd>
+                           </li>
+               
+                           <!-- Еда -->
+                           <li class="list-group-item d-flex justify-content-between align-items-center">
+                             <div>
+                               <input class="form-check-input me-1" type="checkbox" id="flexCheckChecked1" @bind="UseFood">
+                               Захавать еду
+                             </div>
+                             <kbd @onclick='() => ToggleModal("food")'><i class="fa fa-keyboard-o mx-1"></i>@if(_config.foodkey != null)@_config.foodkey.ToUpper()</kbd>
+                           </li>
+               
+                           <!-- Настроение -->
+                           <li class="list-group-item d-flex justify-content-between align-items-center">
+                               <div>
+                                   <input class="form-check-input me-1" type="checkbox" id="flexCheckChecked2" @bind="UseMood">
+                                   Поднять настроение
+                               </div>
+                               <kbd @onclick='() => ToggleModal("mood")'><i class="fa fa-keyboard-o mx-1"></i>@if(_config.moodkey != null)@_config.moodkey.ToUpper()</kbd>
+                           </li>
+               
+                           <!-- Капча -->
+                           <li class="list-group-item d-flex justify-content-between align-items-center">
+                               <div>
+                                   <input class="form-check-input me-1" type="checkbox" id="flexCheckChecked3" @bind="UseCaptcha">
+                                   Решать капчу
+                               </div>
+                           </li>
+               
+                           <!-- Телеграм уведомления -->
+                           <li class="list-group-item d-flex justify-content-between align-items-center">
+                             <div>
+                               <input class="form-check-input me-1" type="checkbox" id="flexCheckChecked4" @bind="_config.TelegramAlert">
+                               Оповещения в телеграм
+                             </div>
+                           </li>
+                           @if (_config.TelegramAlert)
+                           {
+                             
+                               <div class="input-group input-group-sm mb-3" style="margin-top: 5px;">
+                                 <span class="input-group-text" id="inputGroup-sizing-sm">@@username</span>
+                                 <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" @bind-value="_config.TelegramUsername" @bind-value:event="oninput" @onchange="SaveConfig">
+                                 @if (_config.TelegramUsername != null && _config.TelegramUsername.Contains("@"))
+                                 {
+                                   <button class="btn btn-outline-secondary" type="button" id="button-addon2" @onclick='(() => TelegramMessage("Test")) '>Test</button>
+                                 }
+                               </div>
+                             
+                             
+                           }
+                       </ul>
+                   
 
-                  </div>
-                </div>
 
               </div>
               <div class="tab-pane" id="c">

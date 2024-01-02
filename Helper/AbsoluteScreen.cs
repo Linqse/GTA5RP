@@ -21,4 +21,25 @@ public partial class Main
 
         return default;
     }
+    
+    
+    private Rectangle CalculateTargetRectangleMessageAPI( float relativeX, float relativeY, int targetWidth, int targetHeight)
+    {
+        if (Win.ActiveWindow != null)
+        {
+            var dwm = Win.ActiveWindow.ClientBounds;
+
+            // Вычисление центра элемента относительно размера окна
+            int centerX = (int)(dwm.Width * relativeX);
+            int centerY = (int)(dwm.Height * relativeY);
+
+            // Вычисление координат верхнего левого угла нового прямоугольника
+            int newX = centerX - targetWidth / 2;
+            int newY = centerY - targetHeight / 2;
+
+            return new Rectangle(newX, newY, targetWidth, targetHeight);
+        }
+
+        return default;
+    }
 }
