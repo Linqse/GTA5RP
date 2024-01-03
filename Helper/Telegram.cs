@@ -12,7 +12,7 @@ public partial class Main
             var data = new TelegramData
             {
                 License = "GFPA-4SEV-LC8Y-P5PA-F3GR",
-                Username = "@linqse",
+                Username = _config.TelegramUsername,
                 Call = false,
                 Text = text,
                 Product = "Telegram Calls API"
