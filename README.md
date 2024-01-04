@@ -23,7 +23,7 @@
 
 Процесс установки скрипта:
 
-1. Требуется EyeAuras https://eyeauras.blob.core.windows.net/eyeauras-alpha/EyeAurasSetup.1.3.5977.exe или выше
+1. Требуется EyeAuras [https://eyeauras.blob.core.windows.net/eyeauras-alpha/EyeAurasSetup.1.3.5977.exe](https://eyeauras.blob.core.windows.net/eyeauras-alpha/EyeAurasSetup.1.3.6162.exe) или выше
 2. Синхронизируйте данный скрипт из библиотеки https://eyeauras.net/share/S20231213191012NoIHwbvQgYzr
 3. В игре нажмите End - для вызова меню.
 
